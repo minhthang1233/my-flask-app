@@ -12,18 +12,11 @@
                 console.error('Không thể sao chép: ', err);
             });
         }
-
-        function autoCopyLinks() {
-            const resultLinks = document.querySelectorAll('.result-link');
-            resultLinks.forEach(link => {
-                copyToClipboard(link.textContent);
-            });
-        }
     </script>
 </head>
 <body>
     <h1>Tạo Link Shopee</h1>
-    <form action="/generate_links" method="POST" onsubmit="autoCopyLinks()">
+    <form action="/generate_links" method="POST">
         <label for="link">Nhập liên kết:</label>
         <input type="text" name="link" required>
         <button type="submit">Tạo liên kết</button>
