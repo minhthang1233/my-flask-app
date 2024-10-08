@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Link Generator</title>
+    <script>
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                alert('Đã sao chép: ' + text);
+            }).catch(err => {
+                console.error('Không thể sao chép: ', err);
+            });
+        }
+    </script>
+</head>
+<body>
+    <h1>Tạo Link Shopee</h1>
+    <form action="/generate_links" method="POST">
+        <label for="link">Nhập liên kết:</label>
+        <input type="text" name="link" required>
+        <button type="submit">Tạo liên kết</button>
+    </form>
+
+    {% if result %}
+        <h2>Kết quả:</h2>
+        <p>
+            1. {{ result[0] }}
+            <button onclick="copyToClipboard('{{ result[0] }}')">Copy</button>
+        </p>
+        <p>
+            2. {{ result[1] }}
+            <button onclick="copyToClipboard('{{ result[1] }}')">Copy</button>
+        </p>
+    {% endif %}
+
+    {% if error %}
+        <h2 style="color: red;">Lỗi:</h2>
+        <p>{{ error }}</p>
+    {% endif %}
+</body>
+</html>
