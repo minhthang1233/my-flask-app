@@ -1,6 +1,7 @@
-from flask import Flask, request, render_template
+from flask import Flask, request, jsonify, render_template
 import urllib.parse
 import requests
+import os
 
 app = Flask(__name__)
 
@@ -24,17 +25,18 @@ def index():
 # Hàm xử lý kết quả khi người dùng nhập liên kết
 @app.route('/generate_links', methods=['POST'])
 def generate_links():
-    original_link = request.form.get('link')
+    data = request.get_json()  # Nhận dữ liệu JSON từ yêu cầu
+    original_link = data.get('link')  # Lấy liên kết gốc
 
     if not original_link:
-        return render_template('index.html', error="Vui lòng cung cấp liên kết.")
+        return jsonify(error="Vui lòng cung cấp liên kết.")  # Trả về lỗi nếu không có liên kết
 
-    full_link = resolve_short_link(original_link)
+    full_link = resolve_short_link(original_link)  # Giải mã liên kết rút gọn
 
     if not full_link:
-        return render_template('index.html', error="Không thể giải mã liên kết rút gọn.")
+        return jsonify(error="Không thể giải mã liên kết rút gọn.")  # Trả về lỗi nếu không thể giải mã
 
-    encoded_link = encode_link(full_link)
+    encoded_link = encode_link(full_link)  # Mã hóa liên kết
 
     # Tạo 2 kết quả với các affiliate_id khác nhau
     result_1 = f"https://shope.ee/an_redir?origin_link={encoded_link}&affiliate_id=17385530062&sub_id=1review"
@@ -43,7 +45,8 @@ def generate_links():
     # Đưa ra kết quả cho người dùng dưới dạng danh sách
     results = [result_1, result_2]
 
-    return render_template('index.html', result=results)
+    return jsonify(results=results)  # Trả về kết quả dưới dạng JSON
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=81)
+    port = int(os.environ.get('PORT', 5000))  # Sử dụng biến môi trường PORT
+    app.run(host='0.0.0.0', port=port)
