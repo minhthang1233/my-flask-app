@@ -12,31 +12,49 @@
                 console.error('Không thể sao chép: ', err);
             });
         }
+
+        function generateLinks(event) {
+            event.preventDefault(); // Ngăn chặn việc tải lại trang
+            const link = document.querySelector('input[name="link"]').value;
+
+            fetch('/generate_links', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ link })
+            })
+            .then(response => response.json())
+            .then(data => {
+                const resultDiv = document.getElementById('results');
+                resultDiv.innerHTML = ''; // Xóa kết quả cũ
+
+                if (data.error) {
+                    resultDiv.innerHTML = `<h2 style="color: red;">Lỗi:</h2><p>${data.error}</p>`;
+                } else {
+                    resultDiv.innerHTML = `<h2>Kết quả:</h2>`;
+                    data.results.forEach((result, index) => {
+                        resultDiv.innerHTML += `
+                            <p>
+                                ${index + 1}. <span class="result-link">${result}</span>
+                                <button onclick="copyToClipboard('${result}')">Copy</button>
+                            </p>
+                        `;
+                    });
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        }
     </script>
 </head>
 <body>
     <h1>Tạo Link Shopee</h1>
-    <form action="/generate_links" method="POST">
+    <form onsubmit="generateLinks(event)">
         <label for="link">Nhập liên kết:</label>
         <input type="text" name="link" required>
         <button type="submit">Tạo liên kết</button>
     </form>
 
-    {% if result %}
-        <h2>Kết quả:</h2>
-        <p>
-            1. <span class="result-link">{{ result[0] }}</span>
-            <button onclick="copyToClipboard('{{ result[0] }}')">Copy</button>
-        </p>
-        <p>
-            2. <span class="result-link">{{ result[1] }}</span>
-            <button onclick="copyToClipboard('{{ result[1] }}')">Copy</button>
-        </p>
-    {% endif %}
-
-    {% if error %}
-        <h2 style="color: red;">Lỗi:</h2>
-        <p>{{ error }}</p>
-    {% endif %}
+    <div id="results"></div>
 </body>
 </html>
